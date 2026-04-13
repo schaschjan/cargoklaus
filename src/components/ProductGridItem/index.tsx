@@ -11,9 +11,9 @@ type Props = {
 }
 
 export const ProductGridItem: React.FC<Props> = ({ product }) => {
-  const { gallery, priceInUSD, title } = product
+  const { gallery, priceInEUR, title } = product
 
-  let price = priceInUSD
+  let price = priceInEUR
 
   const variants = product.variants?.docs
 
@@ -22,10 +22,10 @@ export const ProductGridItem: React.FC<Props> = ({ product }) => {
     if (
       variant &&
       typeof variant === 'object' &&
-      variant?.priceInUSD &&
-      typeof variant.priceInUSD === 'number'
+      variant?.priceInEUR &&
+      typeof variant.priceInEUR === 'number'
     ) {
-      price = variant.priceInUSD
+      price = variant.priceInEUR
     }
   }
 
@@ -33,11 +33,11 @@ export const ProductGridItem: React.FC<Props> = ({ product }) => {
     gallery?.[0]?.image && typeof gallery[0]?.image !== 'string' ? gallery[0]?.image : false
 
   return (
-    <Link className="relative inline-block h-full w-full group" href={`/products/${product.slug}`}>
+    <Link className="group relative inline-block h-full w-full" href={`/products/${product.slug}`}>
       {image ? (
         <Media
           className={clsx(
-            'relative aspect-square object-cover border rounded-2xl p-8 bg-primary-foreground',
+            'bg-primary-foreground relative aspect-square rounded-2xl border object-cover p-8',
           )}
           height={80}
           imgClassName={clsx('h-full w-full object-cover rounded-2xl', {
@@ -48,7 +48,7 @@ export const ProductGridItem: React.FC<Props> = ({ product }) => {
         />
       ) : null}
 
-      <div className="font-mono text-primary/50 group-hover:text-primary flex justify-between items-center mt-4">
+      <div className="text-primary/50 group-hover:text-primary mt-4 flex items-center justify-between font-mono">
         <div>{title}</div>
 
         {typeof price === 'number' && (

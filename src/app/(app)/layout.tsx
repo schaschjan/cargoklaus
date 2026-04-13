@@ -1,16 +1,27 @@
 import type { ReactNode } from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
+import { CookieConsent } from '@/components/Analytics/CookieConsent'
+import { GoogleAnalytics } from '@/components/Analytics/GoogleAnalytics'
 import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { ensureStartsWith } from '@/utilities/ensureStartsWith'
 import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
-import { GeistSans } from 'geist/font/sans'
-import { GeistMono } from 'geist/font/mono'
+import { Inter, JetBrains_Mono } from 'next/font/google'
 import React from 'react'
 import './globals.css'
+
+const fontSans = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+})
+
+const fontMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+})
 
 /* const { SITE_NAME, TWITTER_CREATOR, TWITTER_SITE } = process.env
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
@@ -42,12 +53,13 @@ const twitterSite = TWITTER_SITE ? ensureStartsWith(TWITTER_SITE, 'https://') : 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
-      className={[GeistSans.variable, GeistMono.variable].filter(Boolean).join(' ')}
+      className={[fontSans.variable, fontMono.variable].filter(Boolean).join(' ')}
       lang="en"
       suppressHydrationWarning
     >
       <head>
         <InitTheme />
+        <GoogleAnalytics />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
       </head>
@@ -59,6 +71,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <Header />
           <main>{children}</main>
           <Footer />
+          <CookieConsent />
         </Providers>
       </body>
     </html>

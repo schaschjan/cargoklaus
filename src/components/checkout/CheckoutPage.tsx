@@ -109,8 +109,8 @@ export const CheckoutPage: React.FC = () => {
 
   if (cartIsEmpty && isProcessingPayment) {
     return (
-      <div className="py-12 w-full items-center justify-center">
-        <div className="prose dark:prose-invert text-center max-w-none self-center mb-8">
+      <div className="w-full items-center justify-center py-12">
+        <div className="prose dark:prose-invert mb-8 max-w-none self-center text-center">
           <p>Processing your payment...</p>
         </div>
         <LoadingSpinner />
@@ -120,7 +120,7 @@ export const CheckoutPage: React.FC = () => {
 
   if (cartIsEmpty) {
     return (
-      <div className="prose dark:prose-invert py-12 w-full items-center">
+      <div className="prose dark:prose-invert w-full items-center py-12">
         <p>Your cart is empty.</p>
         <Link href="/search">Continue shopping?</Link>
       </div>
@@ -128,13 +128,13 @@ export const CheckoutPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-stretch justify-stretch my-8 md:flex-row grow gap-10 md:gap-6 lg:gap-8">
-      <div className="basis-full lg:basis-2/3 flex flex-col gap-8 justify-stretch">
-        <h2 className="font-medium text-3xl">Contact</h2>
+    <div className="my-8 flex grow flex-col items-stretch justify-stretch gap-10 md:flex-row md:gap-6 lg:gap-8">
+      <div className="flex basis-full flex-col justify-stretch gap-8 lg:basis-2/3">
+        <h2 className="text-3xl font-medium">Contact</h2>
         {!user && (
-          <div className=" bg-accent dark:bg-black rounded-lg p-4 w-full flex items-center">
+          <div className="bg-accent flex w-full items-center rounded-lg p-4 dark:bg-black">
             <div className="prose dark:prose-invert">
-              <Button asChild className="no-underline text-inherit" variant="outline">
+              <Button asChild className="text-inherit no-underline" variant="outline">
                 <Link href="/login">Log in</Link>
               </Button>
               <p className="mt-0">
@@ -145,7 +145,7 @@ export const CheckoutPage: React.FC = () => {
           </div>
         )}
         {user ? (
-          <div className="bg-accent dark:bg-card rounded-lg p-4 ">
+          <div className="bg-accent dark:bg-card rounded-lg p-4">
             <div>
               <p>{user.email}</p>{' '}
               <p>
@@ -157,7 +157,7 @@ export const CheckoutPage: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="bg-accent dark:bg-black rounded-lg p-4 ">
+          <div className="bg-accent rounded-lg p-4 dark:bg-black">
             <div>
               <p className="mb-4">Enter your email to checkout as a guest.</p>
 
@@ -187,7 +187,7 @@ export const CheckoutPage: React.FC = () => {
           </div>
         )}
 
-        <h2 className="font-medium text-3xl">Address</h2>
+        <h2 className="text-3xl font-medium">Address</h2>
 
         {billingAddress ? (
           <div>
@@ -219,7 +219,7 @@ export const CheckoutPage: React.FC = () => {
           />
         )}
 
-        <div className="flex gap-4 items-center">
+        <div className="flex items-center gap-4">
           <Checkbox
             id="shippingTheSameAsBilling"
             checked={billingAddressSameAsShipping}
@@ -302,7 +302,7 @@ export const CheckoutPage: React.FC = () => {
           {/* @ts-ignore */}
           {paymentData && paymentData?.['clientSecret'] && (
             <div className="pb-16">
-              <h2 className="font-medium text-3xl">Payment</h2>
+              <h2 className="text-3xl font-medium">Payment</h2>
               {error && <p>{`Error: ${error}`}</p>}
               <Elements
                 options={{
@@ -352,7 +352,7 @@ export const CheckoutPage: React.FC = () => {
       </div>
 
       {!cartIsEmpty && (
-        <div className="basis-full lg:basis-1/3 lg:pl-8 p-8 border-none bg-primary/5 flex flex-col gap-8 rounded-lg">
+        <div className="bg-primary/5 flex basis-full flex-col gap-8 rounded-lg border-none p-8 lg:basis-1/3 lg:pl-8">
           <h2 className="text-3xl font-medium">Your cart</h2>
           {cart?.items?.map((item, index) => {
             if (typeof item.product === 'object' && item.product) {
@@ -366,12 +366,12 @@ export const CheckoutPage: React.FC = () => {
               if (!quantity) return null
 
               let image = gallery?.[0]?.image || meta?.image
-              let price = product?.priceInUSD
+              let price = product?.priceInEUR
 
               const isVariant = Boolean(variant) && typeof variant === 'object'
 
               if (isVariant) {
-                price = variant?.priceInUSD
+                price = variant?.priceInEUR
 
                 const imageVariant = product.gallery?.find((item) => {
                   if (!item.variantOption) return false
@@ -395,18 +395,18 @@ export const CheckoutPage: React.FC = () => {
 
               return (
                 <div className="flex items-start gap-4" key={index}>
-                  <div className="flex items-stretch justify-stretch h-20 w-20 p-2 rounded-lg border">
-                    <div className="relative w-full h-full">
+                  <div className="flex h-20 w-20 items-stretch justify-stretch rounded-lg border p-2">
+                    <div className="relative h-full w-full">
                       {image && typeof image !== 'string' && (
                         <Media className="" fill imgClassName="rounded-lg" resource={image} />
                       )}
                     </div>
                   </div>
-                  <div className="flex grow justify-between items-center">
+                  <div className="flex grow items-center justify-between">
                     <div className="flex flex-col gap-1">
-                      <p className="font-medium text-lg">{title}</p>
+                      <p className="text-lg font-medium">{title}</p>
                       {variant && typeof variant === 'object' && (
-                        <p className="text-sm font-mono text-primary/50 tracking-widest">
+                        <p className="text-primary/50 font-mono text-sm tracking-widest">
                           {variant.options
                             ?.map((option) => {
                               if (typeof option === 'object') return option.label
@@ -429,7 +429,7 @@ export const CheckoutPage: React.FC = () => {
             return null
           })}
           <hr />
-          <div className="flex justify-between items-center gap-2">
+          <div className="flex items-center justify-between gap-2">
             <span className="uppercase">Total</span>{' '}
             <Price className="text-3xl font-medium" amount={cart.subtotal || 0} />
           </div>

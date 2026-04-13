@@ -76,6 +76,7 @@ export interface Config {
     pages: Page;
     categories: Category;
     media: Media;
+    expenses: Expense;
     forms: Form;
     'form-submissions': FormSubmission;
     addresses: Address;
@@ -109,6 +110,7 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    expenses: ExpensesSelect<false> | ExpensesSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     addresses: AddressesSelect<false> | AddressesSelect<true>;
@@ -254,7 +256,7 @@ export interface Order {
   transactions?: (string | Transaction)[] | null;
   status?: OrderStatus;
   amount?: number | null;
-  currency?: 'USD' | null;
+  currency?: 'EUR' | null;
   accessToken?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -297,8 +299,8 @@ export interface Product {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
-  priceInUSDEnabled?: boolean | null;
-  priceInUSD?: number | null;
+  priceInEUREnabled?: boolean | null;
+  priceInEUR?: number | null;
   relatedProducts?: (string | Product)[] | null;
   meta?: {
     title?: string | null;
@@ -599,11 +601,16 @@ export interface ArchiveBlock {
 export interface Category {
   id: string;
   title: string;
+  parent?: (string | null) | Category;
   /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   * URL slug segment for this category (without parent prefix)
    */
-  generateSlug?: boolean | null;
-  slug: string;
+  segment: string;
+  generateSegment?: boolean | null;
+  /**
+   * Full path slug (auto-computed: parent/segment)
+   */
+  slug?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -887,8 +894,8 @@ export interface Variant {
   product: string | Product;
   options: (string | VariantOption)[];
   inventory?: number | null;
-  priceInUSDEnabled?: boolean | null;
-  priceInUSD?: number | null;
+  priceInEUREnabled?: boolean | null;
+  priceInEUR?: number | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -932,7 +939,7 @@ export interface Transaction {
   order?: (string | null) | Order;
   cart?: (string | null) | Cart;
   amount?: number | null;
-  currency?: 'USD' | null;
+  currency?: 'EUR' | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -955,7 +962,7 @@ export interface Cart {
   purchasedAt?: string | null;
   status?: ('active' | 'purchased' | 'abandoned') | null;
   subtotal?: number | null;
-  currency?: 'USD' | null;
+  currency?: 'EUR' | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1022,6 +1029,29 @@ export interface Address {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "expenses".
+ */
+export interface Expense {
+  id: string;
+  title: string;
+  date: string;
+  invoice: string | Media;
+  type: 'filament' | 'shipping' | 'hardware' | 'other';
+  /**
+   * Tax rate as a percentage (e.g. 20 for 20%).
+   */
+  taxRate: number;
+  /**
+   * Net price before tax.
+   */
+  priceNet: number;
+  taxAmount: number;
+  priceGross: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "form-submissions".
  */
 export interface FormSubmission {
@@ -1076,6 +1106,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: string | Media;
+      } | null)
+    | ({
+        relationTo: 'expenses';
+        value: string | Expense;
       } | null)
     | ({
         relationTo: 'forms';
@@ -1364,7 +1398,9 @@ export interface FormBlockSelect<T extends boolean = true> {
  */
 export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
-  generateSlug?: T;
+  parent?: T;
+  segment?: T;
+  generateSegment?: T;
   slug?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1387,6 +1423,22 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "expenses_select".
+ */
+export interface ExpensesSelect<T extends boolean = true> {
+  title?: T;
+  date?: T;
+  invoice?: T;
+  type?: T;
+  taxRate?: T;
+  priceNet?: T;
+  taxAmount?: T;
+  priceGross?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1566,8 +1618,8 @@ export interface VariantsSelect<T extends boolean = true> {
   product?: T;
   options?: T;
   inventory?: T;
-  priceInUSDEnabled?: T;
-  priceInUSD?: T;
+  priceInEUREnabled?: T;
+  priceInEUR?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -1623,8 +1675,8 @@ export interface ProductsSelect<T extends boolean = true> {
   enableVariants?: T;
   variantTypes?: T;
   variants?: T;
-  priceInUSDEnabled?: T;
-  priceInUSD?: T;
+  priceInEUREnabled?: T;
+  priceInEUR?: T;
   relatedProducts?: T;
   meta?:
     | T

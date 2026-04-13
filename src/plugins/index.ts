@@ -3,7 +3,7 @@ import { seoPlugin } from '@payloadcms/plugin-seo'
 import { Plugin } from 'payload'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
-import { ecommercePlugin } from '@payloadcms/plugin-ecommerce'
+import { ecommercePlugin, EUR } from '@payloadcms/plugin-ecommerce'
 
 import { stripeAdapter } from '@payloadcms/plugin-ecommerce/payments/stripe'
 
@@ -83,6 +83,10 @@ export const plugins: Plugin[] = [
       customerOnlyFieldAccess,
       isAdmin,
       isDocumentOwner,
+    },
+    currencies: {
+      defaultCurrency: 'EUR',
+      supportedCurrencies: [EUR],
     },
     customers: {
       slug: 'users',

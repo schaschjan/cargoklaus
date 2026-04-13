@@ -199,7 +199,7 @@ This email verification flow prevents unauthorized access to order details. The 
 
 ## Currencies
 
-By default the template ships with support only for USD however you can change the supported currencies via the [plugin configuration](https://payloadcms.com/docs/ecommerce/plugin#currencies). You will need to ensure that the supported currencies in Payload are also configured in your Payment platforms.
+By default the template ships with support only for EUR however you can change the supported currencies via the [plugin configuration](https://payloadcms.com/docs/ecommerce/plugin#currencies). You will need to ensure that the supported currencies in Payload are also configured in your Payment platforms.
 
 ## Stripe
 

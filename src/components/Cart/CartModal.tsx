@@ -52,13 +52,13 @@ export function CartModal() {
         </SheetHeader>
 
         {!cart || cart?.items?.length === 0 ? (
-          <div className="text-center flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-2 text-center">
             <ShoppingCart className="h-16" />
             <p className="text-center text-2xl font-bold">Your cart is empty.</p>
           </div>
         ) : (
-          <div className="grow flex px-4">
-            <div className="flex flex-col justify-between w-full">
+          <div className="flex grow px-4">
+            <div className="flex w-full flex-col justify-between">
               <ul className="grow overflow-auto py-4">
                 {cart?.items?.map((item, i) => {
                   const product = item.product
@@ -78,12 +78,12 @@ export function CartModal() {
                       : undefined
 
                   let image = firstGalleryImage || metaImage
-                  let price = product.priceInUSD
+                  let price = product.priceInEUR
 
                   const isVariant = Boolean(variant) && typeof variant === 'object'
 
                   if (isVariant) {
-                    price = variant?.priceInUSD
+                    price = variant?.priceInEUR
 
                     const imageVariant = product.gallery?.find((item) => {
                       if (!item.variantOption) return false
@@ -130,7 +130,7 @@ export function CartModal() {
                           <div className="flex flex-1 flex-col text-base">
                             <span className="leading-tight">{product?.title}</span>
                             {isVariant && variant ? (
-                              <p className="text-sm text-neutral-500 dark:text-neutral-400 capitalize">
+                              <p className="text-sm text-neutral-500 capitalize dark:text-neutral-400">
                                 {variant.options
                                   ?.map((option) => {
                                     if (typeof option === 'object') return option.label
@@ -165,7 +165,7 @@ export function CartModal() {
               <div className="px-4">
                 <div className="py-4 text-sm text-neutral-500 dark:text-neutral-400">
                   {typeof cart?.subtotal === 'number' && (
-                    <div className="mb-3 flex items-center justify-between border-b border-neutral-200 pb-1 pt-1 dark:border-neutral-700">
+                    <div className="mb-3 flex items-center justify-between border-b border-neutral-200 pt-1 pb-1 dark:border-neutral-700">
                       <p>Total</p>
                       <Price
                         amount={cart?.subtotal}
