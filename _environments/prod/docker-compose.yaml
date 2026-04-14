@@ -1,27 +1,75 @@
 services:
-  cargoklaus-web:
+  cargoklaus-nginx:
     build:
-      context: .
-      dockerfile: web/Dockerfile
-      args:
-        APP: web
-        PORT: 3001
-        NPM_TOKEN: $NPM_TOKEN
-        NODE_VERSION: 24.12.0
-        TURBO_VERSION: 2.7.2
+      context: nginx
+      dockerfile: Dockerfile
+    restart: unless-stopped
     depends_on:
-      - cargoklaus-mongo
-      - cargoklaus-meili
+      xweiss-nextjs:
+        condition: service_started
+    expose:
+      - 8080
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    security_opt:
+      - no-new-privileges:true
+    # legacy, remove in future
+    environment:
+      VIRTUAL_HOST: $PROJECT_HOSTNAME
+      LETSENCRYPT_HOST: $PROJECT_HOSTNAME
+      LETSENCRYPT_EMAIL: infra@atelierdisko.de
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.cargoklaus-web.rule=Host(`cargoklaus.de`) || Host(`cargo-klaus.de`)"
-      - "traefik.http.routers.cargoklaus-web.entrypoints=websecure"
-      - "traefik.http.routers.cargoklaus-web.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.cargoklaus-nextjs.rule=Host(`cargoklaus.de`) || Host(`www.cargoklaus.de`) || Host(`cargo-klaus.de`) || Host(`www.cargo-klaus.de`)"
+      - "traefik.http.routers.cargoklaus-nextjs.entrypoints=websecure"
+      - "traefik.http.routers.cargoklaus-nextjs.tls.certresolver=letsencrypt"
     networks:
       - web
       - default
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  cargoklaus-web:
+    build:
+      context: .
+      dockerfile: nextjs/Dockerfile
+      args:
+        - NODE_VERSION=22.15.0
+        - PORT=3000
+      secrets:
+        - npm_token
+    restart: unless-stopped
+    depends_on:
+      - cargoklaus-mongo
+    networks:
+      - web
+      - default
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    security_opt:
+      - no-new-privileges:true
     expose:
       - 3001
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   cargoklaus-mongo:
     image: mongo:8.0.8
@@ -29,15 +77,27 @@ services:
       - --storageEngine=wiredTiger
     volumes:
       - cargoklaus-mongo:/data/db
-    logging:
-      driver: none
     expose:
       - 27017
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+secrets:
+  npm_token:
+    environment: NPM_TOKEN
 
 networks:
   web:
-    name: web
+    name: nextjs
     external: true
+
+  # legacy, remove in future
+  default:
+    external:
+      name: nginx-proxy
 
 volumes:
   cargoklaus-mongo:
