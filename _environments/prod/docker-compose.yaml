@@ -1,0 +1,43 @@
+services:
+  cargoklaus-web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+      args:
+        APP: web
+        PORT: 3001
+        NPM_TOKEN: $NPM_TOKEN
+        NODE_VERSION: 24.12.0
+        TURBO_VERSION: 2.7.2
+    depends_on:
+      - cargoklaus-mongo
+      - cargoklaus-meili
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cargoklaus-web.rule=Host(`cargoklaus.de`) || Host(`cargo-klaus.de`)"
+      - "traefik.http.routers.cargoklaus-web.entrypoints=websecure"
+      - "traefik.http.routers.cargoklaus-web.tls.certresolver=letsencrypt"
+    networks:
+      - web
+      - default
+    expose:
+      - 3001
+
+  cargoklaus-mongo:
+    image: mongo:8.0.8
+    command:
+      - --storageEngine=wiredTiger
+    volumes:
+      - cargoklaus-mongo:/data/db
+    logging:
+      driver: none
+    expose:
+      - 27017
+
+networks:
+  web:
+    name: web
+    external: true
+
+volumes:
+  cargoklaus-mongo:

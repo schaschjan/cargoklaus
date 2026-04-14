@@ -1,0 +1,50 @@
+name: deployment
+
+on:
+  push:
+    branches: ["main"]
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: prod
+      url: http://cargoklaus.de
+    env:
+      SSH_USER: ${{ secrets.PROD_SSH_USER }}
+      SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
+      SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+      PROJECT_NAME: ${{ github.event.repository.name }}
+      PROJECT_ENVIRONMENT: prod
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_KEY" > ~/.ssh/infra.key
+          chmod 600 ~/.ssh/infra.key
+          cat >>~/.ssh/config <<END
+          Host target
+            HostName $SSH_HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/infra.key
+            StrictHostKeyChecking no
+          END
+
+      - name: Sync repository
+        if: ${{ env.PROJECT_NAME  != '' && env.PROJECT_ENVIRONMENT != '' }}
+        run: rsync . --archive --recursive --checksum --verbose --exclude .git* --delete target:/var/www/$PROJECT_NAME/current
+
+      - name: Copy shared files and environment configuration
+        if: ${{ env.PROJECT_NAME  != '' && env.PROJECT_ENVIRONMENT != '' }}
+        run: ssh target "cd /var/www/$PROJECT_NAME && cp -rf shared/. current && cd /var/www/$PROJECT_NAME/current && cp -r _environments/$PROJECT_ENVIRONMENT/. . && rm -rf _environments"
+
+      - name: Run postdeploy.sh
+        if: ${{ env.PROJECT_NAME  != '' && env.PROJECT_ENVIRONMENT != '' }}
+        run: ssh target "cd /var/www/$PROJECT_NAME/current && ./postdeploy.sh"

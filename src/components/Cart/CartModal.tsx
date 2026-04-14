@@ -9,7 +9,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
 import { ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -20,10 +19,12 @@ import { DeleteItemButton } from './DeleteItemButton'
 import { EditItemQuantityButton } from './EditItemQuantityButton'
 import { OpenCartButton } from './OpenCart'
 import { Button } from '@/components/ui/button'
-import { Product } from '@/payload-types'
+import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
+import type { Product } from '@/payload-types'
+import type { CartForUseCart } from '@/types/cart'
 
 export function CartModal() {
-  const { cart } = useCart()
+  const { cart } = useCart<CartForUseCart>()
   const [isOpen, setIsOpen] = useState(false)
 
   const pathname = usePathname()
@@ -92,12 +93,10 @@ export function CartModal() {
                           ? item.variantOption.id
                           : item.variantOption
 
-                      const hasMatch = variant?.options?.some((option) => {
+                      return variant?.options?.some((option) => {
                         if (typeof option === 'object') return option.id === variantOptionID
                         else return option === variantOptionID
                       })
-
-                      return hasMatch
                     })
 
                     if (imageVariant && typeof imageVariant.image === 'object') {
