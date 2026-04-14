@@ -38,7 +38,7 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  cargoklaus-web:
+  cargoklaus-nextjs:
     build:
       context: .
       dockerfile: nextjs/Dockerfile
